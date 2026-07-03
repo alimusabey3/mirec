@@ -1,0 +1,421 @@
+"use client";
+
+import { useEffect } from "react";
+
+// Full landing markup, ported verbatim from the original design export so the
+// visual result is byte-identical. Inline event handlers (onmouseover/out) are
+// parsed natively by the browser when injected via dangerouslySetInnerHTML.
+const MARKUP = "<div style=\"position:relative; width:100%;\">\n\n  <!-- ================= CINEMATIC SHELL (fixed) ================= -->\n  <div style=\"position:fixed; inset:0; z-index:90; pointer-events:none;\">\n    <!-- letterbox bars -->\n    <div id=\"letterTop\" style=\"position:absolute; top:0; left:0; right:0; height:0; background:#000; transition:none;\"></div>\n    <div id=\"letterBot\" style=\"position:absolute; bottom:0; left:0; right:0; height:0; background:#000;\"></div>\n    <!-- viewfinder corners -->\n    <div style=\"position:absolute; top:18px; left:18px; width:38px; height:38px; border-left:2px solid rgba(236,230,218,.45); border-top:2px solid rgba(236,230,218,.45);\"></div>\n    <div style=\"position:absolute; top:18px; right:18px; width:38px; height:38px; border-right:2px solid rgba(236,230,218,.45); border-top:2px solid rgba(236,230,218,.45);\"></div>\n    <div style=\"position:absolute; bottom:18px; left:18px; width:38px; height:38px; border-left:2px solid rgba(236,230,218,.45); border-bottom:2px solid rgba(236,230,218,.45);\"></div>\n    <div style=\"position:absolute; bottom:18px; right:18px; width:38px; height:38px; border-right:2px solid rgba(236,230,218,.45); border-bottom:2px solid rgba(236,230,218,.45);\"></div>\n    <!-- REC -->\n    <div style=\"position:absolute; top:30px; left:70px; display:flex; align-items:center; gap:9px; font-family:'Space Mono',monospace; font-size:13px; letter-spacing:2px; color:#ECE6DA;\">\n      <span style=\"width:11px; height:11px; border-radius:50%; background:#E2452F; animation:recblink 1.1s steps(1) infinite; box-shadow:0 0 10px #E2452F;\"></span>REC\n    </div>\n    <!-- timecode -->\n    <div id=\"timecode\" style=\"position:absolute; top:30px; right:70px; font-family:'Space Mono',monospace; font-size:13px; letter-spacing:2px; color:#ECE6DA; opacity:.85;\">00:00:00:00</div>\n    <!-- bottom progress -->\n    <div style=\"position:absolute; bottom:0; left:0; right:0; height:3px; background:rgba(236,230,218,.07);\">\n      <div id=\"progBar\" style=\"height:100%; width:0%; background:linear-gradient(90deg,#F6A93B,#ffd089); box-shadow:0 0 14px #F6A93B;\"></div>\n    </div>\n    <!-- vignette -->\n    <div style=\"position:absolute; inset:0; background:radial-gradient(120% 100% at 50% 45%, transparent 52%, rgba(0,0,0,.55) 100%);\"></div>\n    <!-- grain -->\n    <div style=\"position:absolute; inset:-20%; opacity:.06; mix-blend-mode:screen; animation:grainshift 1.1s steps(3) infinite; background-image:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22&gt;&lt;filter id=%22n%22&gt;&lt;feTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%222%22/&gt;&lt;/filter&gt;&lt;rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/&gt;&lt;/svg&gt;');\"></div>\n  </div>\n\n  <!-- ================= HERO ================= -->\n  <section id=\"hero\" style=\"min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:140px 24px 90px; position:relative; overflow:hidden;\">\n    <div id=\"heroGlow\" style=\"position:absolute; top:38%; left:50%; transform:translate(-50%,-50%); width:900px; height:560px; max-width:140vw; background:radial-gradient(closest-side, rgba(246,169,59,.20), transparent 72%); filter:blur(10px); pointer-events:none;\"></div>\n    <div style=\"position:relative; z-index:2; max-width:1100px;\">\n      <div style=\"font-family:'Space Mono',monospace; font-size:13px; letter-spacing:4px; color:#9b958a; margin-bottom:34px;\">YAPAY ZEKÂ MİKRO-DİZİ STÜDYOSU &nbsp;·&nbsp; 9:16 DİKEY</div>\n      <h1 style=\"font-family:'Oswald',sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:-1px; line-height:.92; font-size:clamp(52px,11vw,168px); margin:0; color:#ECE6DA;\">HERKESİN BİR<br><span style=\"color:#F6A93B;\">DİZİSİ</span> VAR.</h1>\n      <p style=\"font-family:'Manrope',sans-serif; font-size:clamp(16px,2vw,21px); line-height:1.6; color:#b9b3a8; max-width:660px; margin:34px auto 0;\">Senaryonu yaz, sahneyi tarif et — karakterler, çekimler, seslendirme ve kurgu yapay zekâyla gelsin. Her tür kendi diliyle.</p>\n      <div style=\"display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-top:44px;\">\n        <a href=\"#pricing\" style=\"font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; font-size:16px; padding:16px 34px; background:#F6A93B; color:#0a0810; text-decoration:none; transition:transform .18s ease, box-shadow .18s ease; box-shadow:0 0 0 rgba(246,169,59,0);\" onmouseover=\"this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 34px rgba(246,169,59,.34)'\" onmouseout=\"this.style.transform='';this.style.boxShadow='0 0 0 rgba(246,169,59,0)'\">Sahneni kur</a>\n        <a href=\"#flow\" style=\"font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; font-size:16px; padding:16px 34px; background:transparent; color:#ECE6DA; text-decoration:none; border:1px solid rgba(236,230,218,.34); transition:border-color .18s ease, color .18s ease;\" onmouseover=\"this.style.borderColor='#F6A93B';this.style.color='#F6A93B'\" onmouseout=\"this.style.borderColor='rgba(236,230,218,.34)';this.style.color='#ECE6DA'\">Nasıl çalışır?</a>\n      </div>\n    </div>\n    <div style=\"position:absolute; bottom:54px; left:50%; transform:translateX(-50%); font-family:'Space Mono',monospace; font-size:11px; letter-spacing:4px; color:#ECE6DA; animation:hintbob 1.8s ease-in-out infinite;\">KAYDIR ▾</div>\n  </section>\n\n  <!-- ================= GENRE 1 — POLİSİYE ================= -->\n  <section class=\"genre\" data-genre=\"pol\" data-screen-label=\"POLİSİYE\" style=\"height:300vh; position:relative;\">\n    <div id=\"pol-stage\" style=\"position:sticky; top:0; height:100vh; overflow:hidden; background:radial-gradient(120% 90% at 30% 50%, #11151c 0%, #070609 70%);\">\n      <div id=\"pol-glow\" style=\"position:absolute; inset:0; opacity:0; background:radial-gradient(60% 80% at 28% 50%, rgba(124,155,203,.34), transparent 70%);\"></div>\n      <!-- header tag -->\n      <div style=\"position:absolute; top:90px; left:0; right:0; text-align:center; font-family:'Space Mono',monospace; font-size:12px; letter-spacing:4px; color:#7C9BCB; z-index:5;\">POLİSİYE · SUÇ VE GERİLİM</div>\n      <!-- detective silhouette -->\n      <div id=\"pol-det\" style=\"position:absolute; left:6%; bottom:0; width:min(34vw,360px); height:78vh;\">\n        <div style=\"position:absolute; inset:0; background:#02040a; clip-path:polygon(34% 0,66% 0,72% 9%,70% 16%,82% 26%,80% 46%,86% 100%,14% 100%,20% 44%,18% 26%,30% 16%,28% 9%); box-shadow:0 0 60px rgba(124,155,203,.18);\"></div>\n        <!-- gun arm -->\n        <div id=\"pol-arm\" style=\"position:absolute; right:-6%; top:34%; width:46%; height:11px; background:#02040a; border-radius:3px; transform-origin:left center;\"></div>\n      </div>\n      <!-- muzzle flash -->\n      <div id=\"pol-flash\" style=\"position:absolute; left:38%; top:42%; width:120px; height:120px; opacity:0; transform:translate(-50%,-50%); background:radial-gradient(closest-side,#fff,#ffd089 40%,transparent 70%); mix-blend-mode:screen;\"></div>\n      <!-- bullet + trail -->\n      <div id=\"pol-bullet\" style=\"position:absolute; left:0; top:46%; opacity:0; transform:translateX(38vw);\">\n        <div style=\"position:absolute; right:0; top:50%; transform:translateY(-50%); width:240px; height:3px; background:linear-gradient(90deg,transparent,#7C9BCB,#dfeaff); filter:blur(.4px);\"></div>\n        <div style=\"position:absolute; right:0; top:50%; transform:translateY(-50%); width:14px; height:6px; border-radius:3px; background:#fff; box-shadow:0 0 16px #cfe0ff;\"></div>\n        <div style=\"position:absolute; right:30px; top:50%; transform:translateY(-50%); width:520px; height:1px; background:linear-gradient(90deg,transparent,rgba(124,155,203,.5)); opacity:.7;\"></div>\n      </div>\n      <!-- bullet hole -->\n      <div id=\"pol-hole\" style=\"position:absolute; right:8%; top:46%; width:0; height:0; transform:translate(50%,-50%); border-radius:50%; background:radial-gradient(closest-side,#000 40%,rgba(124,155,203,.5) 60%,transparent); box-shadow:0 0 0 0 rgba(124,155,203,.3);\"></div>\n      <!-- card -->\n      <div id=\"pol-card\" style=\"position:absolute; right:7%; top:50%; transform:translate(120%,-50%); opacity:0; max-width:360px; padding:34px; background:rgba(8,12,20,.82); border:1px solid rgba(124,155,203,.4); backdrop-filter:blur(6px);\">\n        <div style=\"font-family:'Space Mono',monospace; font-size:11px; letter-spacing:3px; color:#7C9BCB; margin-bottom:14px;\">TÜR 01 / POLİSİYE</div>\n        <div style=\"font-family:'Oswald',sans-serif; font-weight:700; text-transform:uppercase; font-size:clamp(34px,5vw,58px); line-height:.95; color:#ECE6DA;\">Gerilimi<br>sen kur.</div>\n        <p style=\"font-family:'Manrope'; font-size:15px; line-height:1.55; color:#9fb3d4; margin:16px 0 0;\">Dedektif hikâyeleri, gece kovalamacaları, karanlık sorgu odaları. Loş ışığı ve noir gerilimini bir cümleyle tarif et.</p><div style=\"display:flex; gap:8px; flex-wrap:wrap; margin-top:16px;\"><span style=\"font-family:'Space Mono',monospace; font-size:11px; padding:5px 10px; border:1px solid rgba(236,230,218,.22); color:#cfc8bb;\">Dedektif</span><span style=\"font-family:'Space Mono',monospace; font-size:11px; padding:5px 10px; border:1px solid rgba(236,230,218,.22); color:#cfc8bb;\">Sorgu odası</span><span style=\"font-family:'Space Mono',monospace; font-size:11px; padding:5px 10px; border:1px solid rgba(236,230,218,.22); color:#cfc8bb;\">Gece takibi</span></div>\n      </div>\n    </div>\n  </section>\n\n  <!-- ================= GENRE 2 — AKSİYON ================= -->\n  <section class=\"genre\" data-genre=\"sam\" data-screen-label=\"AKSİYON\" style=\"height:300vh; position:relative;\">\n    <div id=\"sam-stage\" style=\"position:sticky; top:0; height:100vh; overflow:hidden; background:radial-gradient(120% 90% at 70% 50%, #1a0907 0%, #070405 72%);\">\n      <div id=\"sam-glow\" style=\"position:absolute; inset:0; opacity:0; background:radial-gradient(62% 80% at 72% 50%, rgba(226,69,47,.34), transparent 70%);\"></div>\n      <div style=\"position:absolute; top:90px; left:0; right:0; text-align:center; font-family:'Space Mono',monospace; font-size:12px; letter-spacing:4px; color:#E2452F; z-index:6;\">AKSİYON · TAM GAZ</div>\n      <!-- petals container -->\n      <div id=\"sam-petals\" style=\"position:absolute; inset:0; pointer-events:none;\"></div>\n      <!-- samurai silhouette -->\n      <div id=\"sam-fig\" style=\"position:absolute; right:7%; bottom:0; width:min(32vw,340px); height:80vh;\">\n        <div style=\"position:absolute; inset:0; background:#040202; clip-path:polygon(40% 0,60% 0,66% 8%,62% 15%,78% 28%,72% 52%,80% 100%,20% 100%,30% 52%,24% 28%,38% 15%,34% 8%); box-shadow:0 0 60px rgba(226,69,47,.18);\"></div>\n      </div>\n      <!-- katana -->\n      <div id=\"sam-katana\" style=\"position:absolute; right:30%; top:55%; width:46vw; height:6px; transform-origin:right center; transform:rotate(140deg) scaleX(0); background:linear-gradient(90deg,transparent,#ffd9c9,#fff); box-shadow:0 0 22px #E2452F;\"></div>\n      <!-- diagonal slash -->\n      <div id=\"sam-slash\" style=\"position:absolute; top:50%; left:50%; width:170%; height:3px; opacity:0; transform:translate(-50%,-50%) rotate(-32deg) scaleX(0); transform-origin:center; background:linear-gradient(90deg,transparent,#fff 45%,#ffd9c9 55%,transparent); box-shadow:0 0 26px #fff;\"></div>\n      <!-- white flash -->\n      <div id=\"sam-flash\" style=\"position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none;\"></div>\n      <!-- split title -->\n      <div style=\"position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;\">\n        <div style=\"position:relative; height:clamp(70px,12vw,180px); overflow:visible;\">\n          <div id=\"sam-top\" style=\"font-family:'Oswald',sans-serif; font-weight:700; font-size:clamp(70px,13vw,200px); letter-spacing:6px; color:#E2452F; line-height:1; clip-path:inset(0 0 50% 0); transform:translate(0,0); text-shadow:0 0 30px rgba(226,69,47,.5);\">AKSİYON</div>\n          <div id=\"sam-bot\" style=\"position:absolute; inset:0; font-family:'Oswald',sans-serif; font-weight:700; font-size:clamp(70px,13vw,200px); letter-spacing:6px; color:#E2452F; line-height:1; clip-path:inset(50% 0 0 0); transform:translate(0,0); text-shadow:0 0 30px rgba(226,69,47,.5);\">AKSİYON</div>\n        </div>\n      </div>\n      <!-- card -->\n      <div id=\"sam-card\" style=\"position:absolute; left:7%; top:50%; transform:translate(-120%,-50%); opacity:0; max-width:360px; padding:34px; background:rgba(16,5,4,.82); border:1px solid rgba(226,69,47,.45); backdrop-filter:blur(6px);\">\n        <div style=\"font-family:'Space Mono',monospace; font-size:11px; letter-spacing:3px; color:#E2452F; margin-bottom:14px;\">TÜR 02 / AKSİYON</div>\n        <div style=\"font-family:'Oswald',sans-serif; font-weight:700; text-transform:uppercase; font-size:clamp(34px,5vw,58px); line-height:.95; color:#ECE6DA;\">Tek<br>darbede.</div>\n        <p style=\"font-family:'Manrope'; font-size:15px; line-height:1.55; color:#e6a99c; margin:16px 0 0;\">Yüksek tempo, sert dövüşler, patlamalar ve nefes kesen kovalamacalar. Aksiyon sahnelerini bir nefeste üret.</p><div style=\"display:flex; gap:8px; flex-wrap:wrap; margin-top:16px;\"><span style=\"font-family:'Space Mono',monospace; font-size:11px; padding:5px 10px; border:1px solid rgba(236,230,218,.22); color:#cfc8bb;\">Dövüş</span><span style=\"font-family:'Space Mono',monospace; font-size:11px; padding:5px 10px; border:1px solid rgba(236,230,218,.22); color:#cfc8bb;\">Kovalamaca</span><span style=\"font-family:'Space Mono',monospace; font-size:11px; padding:5px 10px; border:1px solid rgba(236,230,218,.22); color:#cfc8bb;\">Patlama</span></div>\n      </div>\n    </div>\n  </section>\n\n  <!-- ================= GENRE 3 — ROMANTİK ================= -->\n  <section class=\"genre\" data-genre=\"rom\" data-screen-label=\"ROMANTİK\" style=\"height:300vh; position:relative;\">\n    <div id=\"rom-stage\" style=\"position:sticky; top:0; height:100vh; overflow:hidden; background:radial-gradient(120% 95% at 50% 55%, #1c0b14 0%, #08040a 74%);\">\n      <div id=\"rom-glow\" style=\"position:absolute; inset:0; opacity:0; background:radial-gradient(50% 60% at 50% 50%, rgba(255,110,156,.4), rgba(255,180,138,.18) 55%, transparent 72%);\"></div>\n      <div style=\"position:absolute; top:90px; left:0; right:0; text-align:center; font-family:'Space Mono',monospace; font-size:12px; letter-spacing:4px; color:#FF6E9C; z-index:6;\">ROMANTİK · DUYGU VE TUTKU</div>\n      <div id=\"rom-petals\" style=\"position:absolute; inset:0; pointer-events:none;\"></div>\n      <!-- hand offering rose: arm from left, rose head -->\n      <div id=\"rom-hand\" style=\"position:absolute; left:0; top:54%; transform:translate(-30%,-50%); width:54vw; height:18px;\">\n        <div style=\"position:absolute; left:0; top:50%; transform:translateY(-50%); width:100%; height:10px; border-radius:6px; background:linear-gradient(90deg,#2a1a12,#5c3a26); box-shadow:0 0 20px rgba(0,0,0,.5);\"></div>\n        <!-- stem -->\n        <div style=\"position:absolute; right:-2px; top:50%; transform:translateY(-50%); width:120px; height:4px; background:linear-gradient(90deg,#3a5a2a,#5c8a3a);\"></div>\n        <!-- rose head -->\n        <div id=\"rom-rose\" style=\"position:absolute; right:-118px; top:50%; transform:translateY(-50%); width:62px; height:62px; border-radius:50%; background:radial-gradient(closest-side,#ffd0dd,#FF6E9C 50%,#c83f6e 80%); box-shadow:0 0 40px rgba(255,110,156,.6);\">\n          <div style=\"position:absolute; inset:30%; border-radius:50%; background:radial-gradient(closest-side,#c83f6e,transparent);\"></div>\n        </div>\n      </div>\n      <!-- card -->\n      <div id=\"rom-card\" style=\"position:absolute; right:8%; top:50%; transform:translate(120%,-50%); opacity:0; max-width:360px; padding:34px; background:rgba(22,8,16,.8); border:1px solid rgba(255,110,156,.45); backdrop-filter:blur(6px);\">\n        <div style=\"font-family:'Space Mono',monospace; font-size:11px; letter-spacing:3px; color:#FF6E9C; margin-bottom:14px;\">TÜR 03 / ROMANTİK</div>\n        <div style=\"font-family:'Oswald',sans-serif; font-weight:700; text-transform:uppercase; font-size:clamp(34px,5vw,58px); line-height:.95; color:#ECE6DA;\">Hisleri<br>çarptır.</div>\n        <p style=\"font-family:'Manrope'; font-size:15px; line-height:1.55; color:#f3b6c8; margin:16px 0 0;\">İlk bakışlar, yağmurda buluşmalar, sıcak vedalar. Kalp atışını yükselten anları duygu dolu sahnelere dönüştür.</p><div style=\"display:flex; gap:8px; flex-wrap:wrap; margin-top:16px;\"><span style=\"font-family:'Space Mono',monospace; font-size:11px; padding:5px 10px; border:1px solid rgba(236,230,218,.22); color:#cfc8bb;\">İlk bakış</span><span style=\"font-family:'Space Mono',monospace; font-size:11px; padding:5px 10px; border:1px solid rgba(236,230,218,.22); color:#cfc8bb;\">Buluşma</span><span style=\"font-family:'Space Mono',monospace; font-size:11px; padding:5px 10px; border:1px solid rgba(236,230,218,.22); color:#cfc8bb;\">Veda</span></div>\n      </div>\n    </div>\n  </section>\n\n  <!-- ================= GENRE 4 — BİLİM KURGU ================= -->\n  <section class=\"genre\" data-genre=\"sci\" data-screen-label=\"BİLİM KURGU\" style=\"height:320vh; position:relative;\">\n    <div id=\"sci-stage\" style=\"position:sticky; top:0; height:100vh; overflow:hidden; background:radial-gradient(120% 100% at 50% 50%, #060a16 0%, #04030a 78%);\">\n      <div id=\"sci-glow\" style=\"position:absolute; inset:0; opacity:0; background:radial-gradient(55% 60% at 50% 50%, rgba(63,230,255,.22), rgba(154,124,255,.16) 55%, transparent 72%);\"></div>\n      <div style=\"position:absolute; top:90px; left:0; right:0; text-align:center; z-index:5; font-family:'Space Mono',monospace; font-size:12px; letter-spacing:4px; color:#3FE6FF;\">BİLİM KURGU · UZAY VE ÖTESİ</div>\n      <div id=\"sci-stars\" style=\"position:absolute; inset:0;\"></div>\n      <!-- portal -->\n      <div id=\"sci-portal\" style=\"position:absolute; left:50%; top:50%; width:300px; height:300px; transform:translate(-50%,-50%) scale(0); border-radius:50%; border:6px solid rgba(63,230,255,.7); animation:spin 6s linear infinite, portalpulse 2.4s ease-in-out infinite; background:radial-gradient(closest-side, rgba(154,124,255,.25), transparent 72%);\">\n        <div style=\"position:absolute; inset:14px; border-radius:50%; border:2px dashed rgba(154,124,255,.7);\"></div>\n      </div>\n      <!-- ship -->\n      <div id=\"sci-ship\" style=\"position:absolute; left:50%; top:50%; opacity:0; transform:translate(-50%,-50%) scale(.2);\">\n        <div style=\"width:90px; height:30px; background:linear-gradient(90deg,#9A7CFF,#3FE6FF); clip-path:polygon(0 50%,30% 0,100% 35%,100% 65%,30% 100%); box-shadow:0 0 30px #3FE6FF;\"></div>\n      </div>\n      <!-- card -->\n      <div id=\"sci-card\" style=\"position:absolute; left:50%; bottom:12%; transform:translate(-50%,40px); opacity:0; max-width:420px; text-align:center; padding:34px; background:rgba(6,10,22,.78); border:1px solid rgba(63,230,255,.4); backdrop-filter:blur(6px);\">\n        <div style=\"font-family:'Space Mono',monospace; font-size:11px; letter-spacing:3px; color:#3FE6FF; margin-bottom:14px;\">TÜR 04 / BİLİM KURGU</div>\n        <div style=\"font-family:'Oswald',sans-serif; font-weight:700; text-transform:uppercase; font-size:clamp(34px,5vw,58px); line-height:.95; color:#ECE6DA;\">Evren kur.</div>\n        <p style=\"font-family:'Manrope'; font-size:15px; line-height:1.55; color:#a9d9e8; margin:16px auto 0; max-width:340px;\">Yeni gezegenler, imkânsız şehirler, warp sıçramaları ve parlayan teknoloji. Hayal ettiğin evreni tek komutla kur.</p><div style=\"display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; justify-content:center;\"><span style=\"font-family:'Space Mono',monospace; font-size:11px; padding:5px 10px; border:1px solid rgba(236,230,218,.22); color:#cfc8bb;\">Uzay</span><span style=\"font-family:'Space Mono',monospace; font-size:11px; padding:5px 10px; border:1px solid rgba(236,230,218,.22); color:#cfc8bb;\">Distopya</span><span style=\"font-family:'Space Mono',monospace; font-size:11px; padding:5px 10px; border:1px solid rgba(236,230,218,.22); color:#cfc8bb;\">Robot</span></div>\n      </div>\n    </div>\n  </section>\n\n  <!-- ================= WORKFLOW ================= -->\n  <section id=\"flow\" style=\"padding:140px 24px 120px; max-width:980px; margin:0 auto; position:relative;\">\n    <div style=\"font-family:'Space Mono',monospace; font-size:12px; letter-spacing:4px; color:#F6A93B; margin-bottom:16px;\">SET AKIŞI</div>\n    <h2 style=\"font-family:'Oswald',sans-serif; font-weight:700; text-transform:uppercase; font-size:clamp(38px,7vw,84px); line-height:.95; margin:0 0 70px; color:#ECE6DA;\">Fikirden<br>perdeye.</h2>\n    <div style=\"position:relative; padding-left:54px;\">\n      <div style=\"position:absolute; left:13px; top:8px; bottom:8px; width:2px; background:linear-gradient(180deg,#F6A93B,rgba(246,169,59,.15));\"></div>\n      <div class=\"flowstep\" style=\"position:relative; margin-bottom:46px;\">\n        <div style=\"position:absolute; left:-54px; top:0; width:28px; height:28px; border-radius:50%; background:#F6A93B; color:#0a0810; display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-weight:700; font-size:12px;\">01</div>\n        <h3 style=\"font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; font-size:26px; margin:0 0 6px; color:#ECE6DA;\">Senaryo</h3>\n        <p style=\"font-family:'Manrope'; color:#9b958a; margin:0; max-width:560px; line-height:1.55;\">Aklındaki hikâyeyi yaz ya da bir cümlelik fikri ver — yapay zekâ bölüm taslağını çıkarır.</p>\n      </div>\n      <div class=\"flowstep\" style=\"position:relative; margin-bottom:46px;\">\n        <div style=\"position:absolute; left:-54px; top:0; width:28px; height:28px; border-radius:50%; background:#F6A93B; color:#0a0810; display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-weight:700; font-size:12px;\">02</div>\n        <h3 style=\"font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; font-size:26px; margin:0 0 6px; color:#ECE6DA;\">Sahne planı</h3>\n        <p style=\"font-family:'Manrope'; color:#9b958a; margin:0; max-width:560px; line-height:1.55;\">Her sahne için kamera açısı, plan tipi ve süre otomatik kurgulanır; istediğini değiştir.</p>\n      </div>\n      <div class=\"flowstep\" style=\"position:relative; margin-bottom:46px;\">\n        <div style=\"position:absolute; left:-54px; top:0; width:28px; height:28px; border-radius:50%; background:#F6A93B; color:#0a0810; display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-weight:700; font-size:12px;\">03</div>\n        <h3 style=\"font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; font-size:26px; margin:0 0 6px; color:#ECE6DA;\">Karakter tutarlılığı</h3>\n        <p style=\"font-family:'Manrope'; color:#9b958a; margin:0; max-width:560px; line-height:1.55;\">Karakterlerin yüzü, kıyafeti ve tarzı tüm bölüm boyunca aynı kalır — sahne sahne tutarlı.</p>\n      </div>\n      <div class=\"flowstep\" style=\"position:relative; margin-bottom:46px;\">\n        <div style=\"position:absolute; left:-54px; top:0; width:28px; height:28px; border-radius:50%; background:#F6A93B; color:#0a0810; display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-weight:700; font-size:12px;\">04</div>\n        <h3 style=\"font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; font-size:26px; margin:0 0 6px; color:#ECE6DA;\">Görüntü</h3>\n        <p style=\"font-family:'Manrope'; color:#9b958a; margin:0 0 12px; max-width:560px; line-height:1.55;\">Sahneler video motorlarıyla çekilir; kaliteyle hızı sen dengelersin.</p>\n        <div style=\"display:flex; gap:10px; flex-wrap:wrap;\">\n          <span style=\"font-family:'Space Mono',monospace; font-size:12px; padding:6px 12px; border:1px solid rgba(236,230,218,.22); color:#cfc8bb;\">Kling</span>\n          <span style=\"font-family:'Space Mono',monospace; font-size:12px; padding:6px 12px; border:1px solid rgba(236,230,218,.22); color:#cfc8bb;\">Seedance</span>\n        </div>\n      </div>\n      <div class=\"flowstep\" style=\"position:relative; margin-bottom:46px;\">\n        <div style=\"position:absolute; left:-54px; top:0; width:28px; height:28px; border-radius:50%; background:#F6A93B; color:#0a0810; display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-weight:700; font-size:12px;\">05</div>\n        <h3 style=\"font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; font-size:26px; margin:0 0 6px; color:#ECE6DA;\">Ses</h3>\n        <p style=\"font-family:'Manrope'; color:#9b958a; margin:0 0 12px; max-width:560px; line-height:1.55;\">Seslendirme, diyalog ve atmosfer sesi karakterlere yerleştirilir.</p>\n        <div style=\"display:flex; gap:10px; flex-wrap:wrap;\">\n          <span style=\"font-family:'Space Mono',monospace; font-size:12px; padding:6px 12px; border:1px solid rgba(236,230,218,.22); color:#cfc8bb;\">ElevenLabs</span>\n        </div>\n      </div>\n      <div class=\"flowstep\" style=\"position:relative; margin-bottom:46px;\">\n        <div style=\"position:absolute; left:-54px; top:0; width:28px; height:28px; border-radius:50%; background:#F6A93B; color:#0a0810; display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-weight:700; font-size:12px;\">06</div>\n        <h3 style=\"font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; font-size:26px; margin:0 0 6px; color:#ECE6DA;\">Kurgu</h3>\n        <p style=\"font-family:'Manrope'; color:#9b958a; margin:0; max-width:560px; line-height:1.55;\">CapCut tarzı zaman çizelgesinde klipleri, sesi ve altyazıyı son haline getir.</p>\n      </div>\n      <div class=\"flowstep\" style=\"position:relative;\">\n        <div style=\"position:absolute; left:-54px; top:0; width:28px; height:28px; border-radius:50%; background:#F6A93B; color:#0a0810; display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-weight:700; font-size:12px;\">07</div>\n        <h3 style=\"font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; font-size:26px; margin:0 0 6px; color:#ECE6DA;\">Yayın</h3>\n        <p style=\"font-family:'Manrope'; color:#9b958a; margin:0; max-width:560px; line-height:1.55;\">Dikey 9:16 olarak dışa aktar, doğrudan paylaş. Perde açık.</p>\n      </div>\n    </div>\n  </section>\n\n  <!-- ================= EDITOR PREVIEW ================= -->\n  <section id=\"editor\" style=\"padding:40px 24px 120px; max-width:1120px; margin:0 auto;\">\n    <div style=\"border:1px solid rgba(236,230,218,.14); background:#0B0A10; box-shadow:0 30px 80px rgba(0,0,0,.5);\">\n      <!-- titlebar -->\n      <div style=\"display:flex; align-items:center; gap:14px; padding:14px 18px; border-bottom:1px solid rgba(236,230,218,.1); background:#0e0d14;\">\n        <div style=\"display:flex; gap:7px;\"><span style=\"width:11px;height:11px;border-radius:50%;background:#E2452F;\"></span><span style=\"width:11px;height:11px;border-radius:50%;background:#F6A93B;\"></span><span style=\"width:11px;height:11px;border-radius:50%;background:#5c8a3a;\"></span></div>\n        <div style=\"font-family:'Space Mono',monospace; font-size:13px; color:#cfc8bb; letter-spacing:1px;\">SAHNE_KURGU.proj</div>\n        <div style=\"margin-left:auto; display:flex; align-items:center; gap:14px;\">\n          <span style=\"width:30px; height:30px; border-radius:50%; background:#F6A93B; color:#0a0810; display:flex; align-items:center; justify-content:center; font-size:12px;\">▶</span>\n          <span id=\"ed-tc\" style=\"font-family:'Space Mono',monospace; font-size:12px; color:#9b958a;\">00:00:04:12</span>\n        </div>\n      </div>\n      <!-- preview -->\n      <div style=\"display:grid; grid-template-columns:1fr; gap:0;\">\n        <div style=\"position:relative; height:200px; background:radial-gradient(120% 120% at 50% 40%,#1a1622,#0B0A10); display:flex; align-items:center; justify-content:center;\">\n          <div style=\"width:84px; height:150px; border-radius:8px; border:1px solid rgba(246,169,59,.4); background:linear-gradient(180deg,#241c2e,#0e0b14); display:flex; align-items:flex-end; justify-content:center; padding-bottom:10px;\">\n            <span style=\"font-family:'Space Mono',monospace; font-size:9px; color:#9b958a;\">9:16</span>\n          </div>\n        </div>\n        <!-- timeline -->\n        <div style=\"position:relative; padding:16px 0 18px; background:#08070c; border-top:1px solid rgba(236,230,218,.1);\">\n          <!-- playhead -->\n          <div id=\"ed-playhead\" style=\"position:absolute; top:0; bottom:0; left:6%; width:2px; background:#F6A93B; box-shadow:0 0 10px #F6A93B; z-index:4;\">\n            <div style=\"position:absolute; top:-1px; left:50%; transform:translateX(-50%); width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid #F6A93B;\"></div>\n          </div>\n          <div style=\"display:flex; flex-direction:column; gap:8px; padding:0 16px;\">\n            <div style=\"display:flex; align-items:center; gap:12px;\"><span style=\"width:42px; font-family:'Space Mono',monospace; font-size:10px; color:#7a756b;\">V1</span><div style=\"flex:1; display:flex; gap:4px; height:34px;\"><div style=\"flex:3; background:linear-gradient(90deg,#3a4a66,#5a6f96); border-radius:3px;\"></div><div style=\"flex:2; background:linear-gradient(90deg,#5a6f96,#7C9BCB); border-radius:3px;\"></div><div style=\"flex:4; background:linear-gradient(90deg,#4a3a66,#7a5f96); border-radius:3px;\"></div></div></div>\n            <div style=\"display:flex; align-items:center; gap:12px;\"><span style=\"width:42px; font-family:'Space Mono',monospace; font-size:10px; color:#7a756b;\">A1</span><div style=\"flex:1; display:flex; gap:4px; height:22px;\"><div style=\"flex:5; background:#2e6b4a; border-radius:3px; opacity:.85;\"></div><div style=\"flex:3; background:#2e6b4a; border-radius:3px; opacity:.85;\"></div></div></div>\n            <div style=\"display:flex; align-items:center; gap:12px;\"><span style=\"width:42px; font-family:'Space Mono',monospace; font-size:10px; color:#7a756b;\">A2</span><div style=\"flex:1; display:flex; gap:4px; height:22px;\"><div style=\"flex:9; background:#6b4a2e; border-radius:3px; opacity:.85;\"></div></div></div>\n            <div style=\"display:flex; align-items:center; gap:12px;\"><span style=\"width:42px; font-family:'Space Mono',monospace; font-size:10px; color:#7a756b;\">TXT</span><div style=\"flex:1; display:flex; gap:4px; height:18px;\"><div style=\"flex:2; background:#6b6b2e; border-radius:3px; opacity:.85;\"></div><div style=\"flex:1;\"></div><div style=\"flex:3; background:#6b6b2e; border-radius:3px; opacity:.85;\"></div></div></div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div style=\"display:flex; gap:18px; flex-wrap:wrap; margin-top:18px; font-family:'Space Mono',monospace; font-size:11px; color:#7a756b;\">\n      <span><span style=\"display:inline-block;width:9px;height:9px;background:#7C9BCB;margin-right:6px;\"></span>V1 Görüntü</span>\n      <span><span style=\"display:inline-block;width:9px;height:9px;background:#2e6b4a;margin-right:6px;\"></span>A1 Ses</span>\n      <span><span style=\"display:inline-block;width:9px;height:9px;background:#6b4a2e;margin-right:6px;\"></span>A2 Müzik</span>\n      <span><span style=\"display:inline-block;width:9px;height:9px;background:#6b6b2e;margin-right:6px;\"></span>TXT Altyazı</span>\n    </div>\n  </section>\n\n  <!-- ================= PRICING ================= -->\n  <section id=\"pricing\" style=\"padding:120px 24px; max-width:1160px; margin:0 auto;\">\n    <div style=\"text-align:center; max-width:680px; margin:0 auto 64px;\">\n      <div style=\"font-family:'Space Mono',monospace; font-size:12px; letter-spacing:4px; color:#F6A93B; margin-bottom:16px;\">KREDİ &amp; PLANLAR</div>\n      <h2 style=\"font-family:'Oswald',sans-serif; font-weight:700; text-transform:uppercase; font-size:clamp(38px,7vw,76px); line-height:.95; margin:0 0 20px; color:#ECE6DA;\">Sürpriz fatura yok.</h2>\n      <p style=\"font-family:'Manrope'; color:#9b958a; line-height:1.6; margin:0;\">Üretim, motorların API maliyetiyle çalışır. Sen kredi alırsın, her sahne kredi yakar — ne kadar üretirsen o kadar ödersin.</p>\n    </div>\n    <div style=\"display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:22px; align-items:stretch;\">\n      <!-- Başlangıç -->\n      <div style=\"display:flex; flex-direction:column; padding:36px 30px; background:#0B0A10; border:1px solid rgba(236,230,218,.14);\">\n        <div style=\"font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; font-size:24px; letter-spacing:1px; color:#ECE6DA;\">Başlangıç</div>\n        <div style=\"font-family:'Oswald',sans-serif; font-weight:700; font-size:54px; color:#ECE6DA; margin:18px 0 2px;\">₺0</div>\n        <div style=\"font-family:'Space Mono',monospace; font-size:12px; color:#7a756b; margin-bottom:24px;\">100 DENEME KREDİSİ</div>\n        <ul style=\"list-style:none; padding:0; margin:0 0 28px; display:flex; flex-direction:column; gap:12px; font-family:'Manrope'; font-size:14px; color:#b9b3a8;\">\n          <li>· Tüm türler ve şablonlar</li>\n          <li>· Tek bölüm üretimi</li>\n          <li>· 9:16 dışa aktarma (filigranlı)</li>\n        </ul>\n        <a href=\"#\" style=\"margin-top:auto; text-align:center; font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; letter-spacing:1px; padding:14px; border:1px solid rgba(236,230,218,.3); color:#ECE6DA; text-decoration:none; transition:border-color .18s;\" onmouseover=\"this.style.borderColor='#F6A93B'\" onmouseout=\"this.style.borderColor='rgba(236,230,218,.3)'\">Ücretsiz dene</a>\n      </div>\n      <!-- Yaratıcı -->\n      <div style=\"display:flex; flex-direction:column; padding:36px 30px; background:linear-gradient(180deg,#16110a,#0B0A10); border:1.5px solid #F6A93B; position:relative; box-shadow:0 0 50px rgba(246,169,59,.14);\">\n        <div style=\"position:absolute; top:-12px; left:50%; transform:translateX(-50%); font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; background:#F6A93B; color:#0a0810; padding:5px 14px;\">EN POPÜLER</div>\n        <div style=\"font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; font-size:24px; letter-spacing:1px; color:#F6A93B;\">Yaratıcı</div>\n        <div style=\"font-family:'Oswald',sans-serif; font-weight:700; font-size:54px; color:#ECE6DA; margin:18px 0 2px;\">₺349<span style=\"font-size:18px; color:#7a756b; font-weight:500;\">/ay</span></div>\n        <div style=\"font-family:'Space Mono',monospace; font-size:12px; color:#F6A93B; margin-bottom:24px;\">2.500 KREDİ / AY</div>\n        <ul style=\"list-style:none; padding:0; margin:0 0 28px; display:flex; flex-direction:column; gap:12px; font-family:'Manrope'; font-size:14px; color:#d8d2c6;\">\n          <li>· Filigransız 9:16 export</li>\n          <li>· Karakter tutarlılığı kilidi</li>\n          <li>· Tüm video &amp; ses motorları</li>\n          <li>· Öncelikli üretim kuyruğu</li>\n        </ul>\n        <a href=\"#\" style=\"margin-top:auto; text-align:center; font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; letter-spacing:1px; padding:14px; background:#F6A93B; color:#0a0810; text-decoration:none; transition:transform .18s, box-shadow .18s;\" onmouseover=\"this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 30px rgba(246,169,59,.34)'\" onmouseout=\"this.style.transform='';this.style.boxShadow='none'\">Yaratıcı'yı seç</a>\n      </div>\n      <!-- Stüdyo -->\n      <div style=\"display:flex; flex-direction:column; padding:36px 30px; background:#0B0A10; border:1px solid rgba(236,230,218,.14);\">\n        <div style=\"font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; font-size:24px; letter-spacing:1px; color:#ECE6DA;\">Stüdyo</div>\n        <div style=\"font-family:'Oswald',sans-serif; font-weight:700; font-size:54px; color:#ECE6DA; margin:18px 0 2px;\">₺1.290<span style=\"font-size:18px; color:#7a756b; font-weight:500;\">/ay</span></div>\n        <div style=\"font-family:'Space Mono',monospace; font-size:12px; color:#7a756b; margin-bottom:24px;\">10.000 KREDİ / AY</div>\n        <ul style=\"list-style:none; padding:0; margin:0 0 28px; display:flex; flex-direction:column; gap:12px; font-family:'Manrope'; font-size:14px; color:#b9b3a8;\">\n          <li>· Ekip çalışma alanı (5 koltuk)</li>\n          <li>· Marka kiti &amp; şablon kütüphanesi</li>\n          <li>· 4K yükseltme</li>\n          <li>· Özel destek</li>\n        </ul>\n        <a href=\"#\" style=\"margin-top:auto; text-align:center; font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; letter-spacing:1px; padding:14px; border:1px solid rgba(236,230,218,.3); color:#ECE6DA; text-decoration:none; transition:border-color .18s;\" onmouseover=\"this.style.borderColor='#F6A93B'\" onmouseout=\"this.style.borderColor='rgba(236,230,218,.3)'\">Ekibini kur</a>\n      </div>\n    </div>\n    <p style=\"text-align:center; font-family:'Space Mono',monospace; font-size:11px; color:#5f5b54; margin-top:28px;\">* Rakamlar yer tutucudur.</p>\n  </section>\n\n  <!-- ================= FINAL CTA ================= -->\n  <section id=\"final\" style=\"min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:120px 24px; position:relative; overflow:hidden;\">\n    <div style=\"position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:1000px; height:600px; max-width:150vw; background:radial-gradient(closest-side, rgba(246,169,59,.16), transparent 70%); pointer-events:none;\"></div>\n    <div style=\"position:relative; z-index:2;\">\n      <div style=\"font-family:'Space Mono',monospace; font-size:12px; letter-spacing:4px; color:#9b958a; margin-bottom:30px;\">SON SAHNE</div>\n      <h2 style=\"font-family:'Oswald',sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:-1px; line-height:.9; font-size:clamp(56px,13vw,200px); margin:0; color:#ECE6DA;\">MIREC<br><span style=\"color:#F6A93B;\">AÇILIYOR.</span></h2>\n      <p style=\"font-family:'Manrope'; font-size:clamp(16px,2vw,20px); color:#b9b3a8; max-width:560px; margin:32px auto 40px; line-height:1.6;\">Aklındaki dizi, ilk sahnesini bekliyor. Klaketi sen tut.</p>\n      <a href=\"#\" style=\"display:inline-block; font-family:'Oswald',sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:2px; font-size:18px; padding:20px 52px; background:#F6A93B; color:#0a0810; text-decoration:none; transition:transform .18s, box-shadow .18s;\" onmouseover=\"this.style.transform='translateY(-3px)';this.style.boxShadow='0 16px 44px rgba(246,169,59,.4)'\" onmouseout=\"this.style.transform='';this.style.boxShadow='none'\">Hemen başla</a>\n    </div>\n  </section>\n\n  <!-- ================= FOOTER ================= -->\n  <footer style=\"border-top:1px solid rgba(236,230,218,.1); padding:50px 24px; display:flex; flex-wrap:wrap; gap:24px; align-items:center; justify-content:space-between; max-width:1160px; margin:0 auto;\">\n    <div style=\"display:flex; align-items:center; gap:14px;\">\n      <div style=\"width:38px; height:38px; position:relative; background:#ECE6DA; clip-path:polygon(0 38%,100% 0,100% 100%,0 100%);\">\n        <div style=\"position:absolute; top:0; left:0; right:0; height:38%; background:repeating-linear-gradient(115deg,#070609 0 8px,#ECE6DA 8px 16px);\"></div>\n      </div>\n      <span style=\"font-family:'Oswald',sans-serif; font-weight:700; font-size:24px; letter-spacing:2px; color:#ECE6DA;\">MIREC</span>\n    </div>\n    <div class=\"ftcol\" style=\"font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:#7a756b; text-align:right;\">YAPAY ZEKÂ MİKRO-DİZİ STÜDYOSU · İSTANBUL · © 2026</div>\n  </footer>\n\n</div>";
+
+// Scroll-driven cinematic controller (faithful port of the original DCLogic
+// component): a persistent requestAnimationFrame loop reads scroll position and
+// drives every genre scene by mutating elements looked up by id.
+class Cinematic {
+  componentDidMount() {
+    this.reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.$ = (id) => document.getElementById(id);
+    this.spawnParticles();
+    if (this.reduced) this.setFinal();
+    this.scroller = this.findScroller();
+    // persistent rAF loop — independent of scroll events (robust across inner scrollers & tab refocus)
+    this.running = true;
+    const loop = () => { if (!this.running) return; try { this.update(); } catch (e) {} this.raf = requestAnimationFrame(loop); };
+    this.raf = requestAnimationFrame(loop);
+    this.onResize = () => { this.scroller = this.findScroller(); this.update(); };
+    window.addEventListener('resize', this.onResize);
+    this.update();
+  }
+  componentWillUnmount() {
+    this.running = false;
+    if (this.raf) cancelAnimationFrame(this.raf);
+    if (this.onResize) window.removeEventListener('resize', this.onResize);
+  }
+  findScroller() {
+    let el = document.getElementById('hero');
+    while (el && el !== document.body) {
+      const o = getComputedStyle(el);
+      const oy = o.overflowY, ov = o.overflow;
+      if ((oy === 'auto' || oy === 'scroll' || ov === 'auto' || ov === 'scroll') && el.scrollHeight > el.clientHeight + 4) return el;
+      el = el.parentElement;
+    }
+    return document.scrollingElement || document.documentElement;
+  }
+
+  clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  map(v, a, b, c, d) { return c + (this.clamp(v, a, b) - a) * (d - c) / (b - a || 1); }
+  // progress through a tall pinned section (0..1)
+  prog(el) {
+    if (!el) return 0;
+    const r = el.getBoundingClientRect();
+    const total = el.offsetHeight - window.innerHeight;
+    return this.clamp(-r.top / (total || 1), 0, 1);
+  }
+
+  spawnParticles() {
+    const petalSrc = (cont, n, colors) => {
+      const c = this.$(cont); if (!c) return; c.innerHTML = "";
+      for (let i = 0; i < n; i++) {
+        const p = document.createElement('div');
+        const s = 6 + Math.random() * 10;
+        p.className = '__petal';
+        p.style.cssText = `position:absolute; left:${Math.random()*100}%; top:${-10 - Math.random()*30}%; width:${s}px; height:${s*0.6}px; border-radius:60% 60% 60% 0; background:${colors[i%colors.length]}; opacity:0; filter:blur(.3px);`;
+        p.dataset.sp = 0.4 + Math.random() * 0.9;   // fall speed
+        p.dataset.sw = 6 + Math.random() * 14;       // sway amplitude
+        p.dataset.ph = Math.random() * 6.28;
+        c.appendChild(p);
+      }
+    };
+    petalSrc('sam-petals', 20, ['#E2452F', '#ff8d6e', '#ffd9c9']);
+    petalSrc('rom-petals', 18, ['#FF6E9C', '#FFB48A', '#ffd0dd']);
+    // stars
+    const sc = this.$('sci-stars');
+    if (sc) {
+      sc.innerHTML = "";
+      for (let i = 0; i < 90; i++) {
+        const ang = Math.random() * 6.2832;
+        const rad = 4 + Math.random() * 46; // % from center
+        const st = document.createElement('div');
+        st.className = '__star';
+        st.style.cssText = `position:absolute; left:50%; top:50%; width:2px; height:2px; border-radius:2px; background:#cfeffd; transform:translate(-50%,-50%);`;
+        st.dataset.ang = ang; st.dataset.rad = rad;
+        sc.appendChild(st);
+      }
+    }
+  }
+
+  setFinal() {
+    // reduced-motion: show all cards & end-states, no animation
+    const show = (id, css) => { const e = this.$(id); if (e) e.style.cssText += css; };
+    ['pol-glow','sam-glow','rom-glow','sci-glow'].forEach(id => show(id, 'opacity:1;'));
+    show('pol-card', 'opacity:1; transform:translate(0,-50%);');
+    show('sam-card', 'opacity:1; transform:translate(0,-50%);');
+    show('rom-card', 'opacity:1; transform:translate(0,-50%);');
+    show('sci-card', 'opacity:1; transform:translate(-50%,0);');
+    show('pol-hole', 'width:46px; height:46px;');
+    show('sam-top', 'transform:translate(-14px,-10px);');
+    show('sam-bot', 'transform:translate(14px,10px);');
+    show('rom-rose', '');
+    const rh = this.$('rom-hand'); if (rh) rh.style.transform = 'translate(34%,-50%)';
+    show('sci-portal', 'transform:translate(-50%,-50%) scale(1);');
+    document.querySelectorAll('.__petal').forEach(p => p.style.opacity = '.8');
+  }
+
+  fmtTC(frames) {
+    const f = Math.floor(frames % 24);
+    const s = Math.floor(frames / 24) % 60;
+    const m = Math.floor(frames / 1440) % 60;
+    const h = Math.floor(frames / 86400) % 100;
+    const z = (n) => String(n).padStart(2, '0');
+    return `${z(h)}:${z(m)}:${z(s)}:${z(f)}`;
+  }
+
+  update() {
+    const sc = this.scroller || document.scrollingElement || document.documentElement;
+    const isDoc = (sc === document.scrollingElement || sc === document.documentElement || sc === document.body);
+    const sTop = isDoc ? (window.scrollY || document.documentElement.scrollTop || 0) : sc.scrollTop;
+    const max = (sc.scrollHeight - sc.clientHeight) || 1;
+    const gp = this.clamp(sTop / max, 0, 1);
+    // timecode + progress bar
+    const tc = this.$('timecode'); if (tc) tc.textContent = this.fmtTC(gp * 6 * 1440); // ~6 min reel
+    const pb = this.$('progBar'); if (pb) pb.style.width = (gp * 100).toFixed(2) + '%';
+
+    // letterbox: open during genre sections (rect-based, scroller-agnostic)
+    const genres = document.querySelectorAll('.genre');
+    if (genres.length) {
+      const f = genres[0].getBoundingClientRect();
+      const l = genres[genres.length - 1].getBoundingClientRect();
+      const cy = window.innerHeight / 2;
+      let lb = 0;
+      if (f.top < cy && l.bottom > cy) lb = this.clamp(Math.min(cy - f.top, l.bottom - cy) / 260, 0, 1);
+      const h = (lb * 66).toFixed(1) + 'px';
+      const lt = this.$('letterTop'), lbt = this.$('letterBot');
+      if (lt) lt.style.height = h; if (lbt) lbt.style.height = h;
+    }
+
+    if (this.reduced) return;
+    this.polisiye();
+    this.samuray();
+    this.romantik();
+    this.scifi();
+    this.editor();
+  }
+
+  // ---------- POLİSİYE ----------
+  polisiye() {
+    const sec = document.querySelector('[data-genre="pol"]'); const p = this.prog(sec);
+    const set = (id, css) => { const e = this.$(id); if (e) e.style.cssText = this._base('pol', id) + css; };
+    this.$('pol-glow').style.opacity = this.map(p, 0, 0.12, 0, 1);
+    // flash pulse around 0.18-0.28
+    const fl = 1 - Math.abs(this.map(p, 0.16, 0.30, -1, 1));
+    this.$('pol-flash').style.opacity = this.clamp(fl, 0, 1).toFixed(3);
+    const sc = this.clamp(fl, 0, 1) * 1.4 + 0.6;
+    this.$('pol-flash').style.transform = `translate(-50%,-50%) scale(${sc})`;
+    // detective recoil
+    const recoil = this.clamp(fl, 0, 1) * -18;
+    this.$('pol-det').style.transform = `translateX(${recoil}px)`;
+    // bullet 0.24 -> 0.6
+    const bx = this.map(p, 0.24, 0.60, 8, 92);
+    const bv = (p > 0.23 && p < 0.63) ? 1 : 0;
+    this.$('pol-bullet').style.opacity = bv;
+    this.$('pol-bullet').style.transform = `translateX(${bx}vw)`;
+    // shake at impact 0.58-0.66
+    const shk = (p > 0.58 && p < 0.68) ? (1 - Math.abs(this.map(p, 0.58, 0.68, -1, 1))) : 0;
+    const jx = (Math.random() - 0.5) * shk * 16, jy = (Math.random() - 0.5) * shk * 16;
+    this.$('pol-stage').style.transform = `translate(${jx}px,${jy}px)`;
+    // hole grows after 0.6
+    const hs = this.map(p, 0.60, 0.70, 0, 46);
+    const he = this.$('pol-hole'); he.style.width = hs + 'px'; he.style.height = hs + 'px';
+    he.style.boxShadow = `0 0 ${hs * 0.6}px ${hs * 0.2}px rgba(124,155,203,.4)`;
+    // card 0.72 -> 0.86
+    const cx = this.map(p, 0.72, 0.88, 120, 0);
+    this.$('pol-card').style.transform = `translate(${cx}%,-50%)`;
+    this.$('pol-card').style.opacity = this.map(p, 0.72, 0.84, 0, 1);
+  }
+
+  // ---------- SAMURAY ----------
+  samuray() {
+    const sec = document.querySelector('[data-genre="sam"]'); const p = this.prog(sec);
+    this.$('sam-glow').style.opacity = this.map(p, 0, 0.12, 0, 1);
+    // katana draw + swing 0.15 -> 0.45 (scaleX 0->1 then rotate sweep)
+    const draw = this.map(p, 0.15, 0.40, 0, 1);
+    const rot = this.map(p, 0.18, 0.46, 140, -28);
+    this.$('sam-katana').style.transform = `rotate(${rot}deg) scaleX(${draw})`;
+    this.$('sam-katana').style.opacity = (p > 0.13 && p < 0.52) ? 1 : (p >= 0.52 ? 0 : 0);
+    // slash line sweeps 0.42 -> 0.55
+    const slash = this.map(p, 0.42, 0.55, 0, 1);
+    this.$('sam-slash').style.transform = `translate(-50%,-50%) rotate(-32deg) scaleX(${slash})`;
+    this.$('sam-slash').style.opacity = (p > 0.40 && p < 0.62) ? 1 : 0;
+    // white flash at 0.54-0.6
+    const wf = 1 - Math.abs(this.map(p, 0.53, 0.62, -1, 1));
+    this.$('sam-flash').style.opacity = (this.clamp(wf, 0, 1) * 0.9).toFixed(3);
+    // title splits after 0.56
+    const sp = this.map(p, 0.56, 0.74, 0, 1);
+    this.$('sam-top').style.transform = `translate(${-14 * sp}px,${-12 * sp}px)`;
+    this.$('sam-bot').style.transform = `translate(${14 * sp}px,${12 * sp}px)`;
+    // petals 0.5 -> 1
+    this.driftPetals('sam-petals', this.map(p, 0.50, 0.70, 0, 1), p);
+    // card 0.76 -> 0.9
+    const cx = this.map(p, 0.76, 0.90, -120, 0);
+    this.$('sam-card').style.transform = `translate(${cx}%,-50%)`;
+    this.$('sam-card').style.opacity = this.map(p, 0.76, 0.88, 0, 1);
+  }
+
+  // ---------- ROMANTİK ----------
+  romantik() {
+    const sec = document.querySelector('[data-genre="rom"]'); const p = this.prog(sec);
+    this.$('rom-glow').style.opacity = this.map(p, 0.1, 0.55, 0, 1);
+    // hand advances from -30% to center over 0.1 -> 0.6
+    const hx = this.map(p, 0.10, 0.60, -30, 30);
+    this.$('rom-hand').style.transform = `translate(${hx}%,-50%)`;
+    // bloom on rose
+    const bl = this.map(p, 0.4, 0.7, 0, 1);
+    this.$('rom-rose').style.boxShadow = `0 0 ${40 + bl * 60}px ${bl * 24}px rgba(255,110,156,${0.5 + bl * 0.4})`;
+    this.driftPetals('rom-petals', this.map(p, 0.30, 0.55, 0, 1), p);
+    // card 0.66 -> 0.84
+    const cx = this.map(p, 0.66, 0.86, 120, 0);
+    this.$('rom-card').style.transform = `translate(${cx}%,-50%)`;
+    this.$('rom-card').style.opacity = this.map(p, 0.66, 0.82, 0, 1);
+  }
+
+  // ---------- BİLİM KURGU ----------
+  scifi() {
+    const sec = document.querySelector('[data-genre="sci"]'); const p = this.prog(sec);
+    this.$('sci-glow').style.opacity = this.map(p, 0, 0.15, 0, 1);
+    // warp 0.1 -> 0.45 stretch out; back to normal 0.7 -> 0.9
+    const warp = (p < 0.55) ? this.map(p, 0.10, 0.45, 0, 1) : this.map(p, 0.70, 0.92, 1, 0);
+    document.querySelectorAll('#sci-stars .__star').forEach(st => {
+      const ang = parseFloat(st.dataset.ang), rad = parseFloat(st.dataset.rad);
+      const r = rad * (1 + warp * 1.8);
+      const x = Math.cos(ang) * r, y = Math.sin(ang) * r;
+      const len = 1 + warp * 26;
+      st.style.transform = `translate(-50%,-50%) translate(${x}vmin,${y}vmin) rotate(${ang}rad) scaleX(${len})`;
+      st.style.opacity = (0.4 + warp * 0.5).toFixed(2);
+    });
+    // portal opens 0.38 -> 0.6, closes 0.78 -> 0.95
+    const po = (p < 0.7) ? this.map(p, 0.38, 0.60, 0, 1) : this.map(p, 0.78, 0.95, 1, 0);
+    this.$('sci-portal').style.transform = `translate(-50%,-50%) scale(${po})`;
+    // ship 0.56 -> 0.78 flies forward
+    const shipP = this.map(p, 0.56, 0.78, 0, 1);
+    const shv = (p > 0.54 && p < 0.80) ? 1 : 0;
+    this.$('sci-ship').style.opacity = shv;
+    this.$('sci-ship').style.transform = `translate(-50%,-50%) translateX(${this.map(shipP,0,1,-10,40)}vw) scale(${0.2 + shipP * 1.3})`;
+    // card 0.80 -> 0.95
+    const cy = this.map(p, 0.80, 0.95, 40, 0);
+    this.$('sci-card').style.transform = `translate(-50%,${cy}px)`;
+    this.$('sci-card').style.opacity = this.map(p, 0.80, 0.93, 0, 1);
+  }
+
+  driftPetals(cont, intensity, p) {
+    const c = this.$(cont); if (!c) return;
+    const t = p * 1400;
+    c.querySelectorAll('.__petal').forEach((el, i) => {
+      const sp = parseFloat(el.dataset.sp), sw = parseFloat(el.dataset.sw), ph = parseFloat(el.dataset.ph);
+      const fall = ((t * sp + i * 40) % 130) - 15;        // vh-ish 0..115
+      const sway = Math.sin((t * 0.01 * sp) + ph) * sw;
+      el.style.transform = `translate(${sway}px, ${fall}vh) rotate(${fall * 4}deg)`;
+      el.style.opacity = (intensity * 0.85).toFixed(2);
+    });
+  }
+
+  editor() {
+    const sec = this.$('editor'); if (!sec) return;
+    const r = sec.getBoundingClientRect();
+    const p = this.clamp((window.innerHeight - r.top) / (window.innerHeight + r.height), 0, 1);
+    const ph = this.$('ed-playhead'); if (ph) ph.style.left = this.map(p, 0.1, 0.9, 6, 94) + '%';
+    const tc = this.$('ed-tc'); if (tc) tc.textContent = this.fmtTC(this.map(p, 0.1, 0.9, 0, 1) * 9 * 24 + 24);
+  }
+
+  _base() { return ''; }
+
+  renderVals() { return {}; }
+}
+
+// Scroll-scrub videos (Polisiye / Aksiyon / Romantik / Bilim Kurgu). Verbatim
+// port of the original trailing script: each scene gets a <video> whose
+// currentTime is driven by scroll progress. Local mp4s are served from /public;
+// the CloudFront URLs are the fallbacks used when a local file is absent.
+function initScrubVideos() {
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+
+  /* ---------- A) POLISIYE: full scroll-scrub video ---------- */
+  (function(){
+    var V,SEC,duration=0,ready=false,target=0,wanted=0,seeking=false,primed=false;
+    function wire(){
+      try{V.muted=true;V.pause();}catch(e){}
+      V.addEventListener('loadedmetadata',function(){duration=V.duration||0;});
+      V.addEventListener('loadeddata',function(){ready=true;try{V.pause();}catch(e){}});
+      V.addEventListener('seeked',function(){seeking=false;});
+      function prime(){ if(primed)return; primed=true; try{var p=V.play(); if(p&&p.then){p.then(function(){try{V.pause();}catch(e){}}).catch(function(){});}else{V.pause();}}catch(e){} }
+      ['touchstart','wheel','click','keydown'].forEach(function(ev){window.addEventListener(ev,prime,{once:true,passive:true});});
+      function progress(){var r=SEC.getBoundingClientRect();var run=SEC.offsetHeight-window.innerHeight;return clamp(-r.top/run,0,1);}
+      function commit(){ if(!ready||!duration||seeking)return; if(!V.paused){try{V.pause();}catch(e){}} var tt=clamp(wanted,0,duration-0.05); if(Math.abs(V.currentTime-tt)<0.008)return; seeking=true; try{V.currentTime=tt;}catch(e){seeking=false;} }
+      function onScroll(){ if(duration) target=progress()*duration; }
+      window.addEventListener('scroll',onScroll,{passive:true});
+      window.addEventListener('resize',onScroll);
+      (function tick(){ wanted+=(target-wanted)*0.22; if(Math.abs(target-wanted)<0.004)wanted=target; commit(); requestAnimationFrame(tick); })();
+      onScroll();
+    }
+    function build(stage,sec){
+      SEC=sec;
+      var st=document.createElement('style');
+      st.textContent='[data-genre="pol"] #pol-det,[data-genre="pol"] #pol-flash,[data-genre="pol"] #pol-bullet,[data-genre="pol"] #pol-hole,[data-genre="pol"] #pol-glow{display:none !important;}#pol-scrub{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;background:#000;}#pol-grade{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(7,6,9,.5) 0%,transparent 20%,transparent 60%,rgba(7,6,9,.85) 100%);}[data-genre="pol"] #pol-card{z-index:5;}';
+      document.head.appendChild(st);
+      V=document.createElement('video');
+      V.id='pol-scrub'; V.muted=true; V.preload='auto'; V.setAttribute('playsinline',''); V.setAttribute('muted','');
+      var s1=document.createElement('source'); s1.src='perde_polisiye.mp4'; s1.type='video/mp4';
+      var s2=document.createElement('source'); s2.src='https://d8j0ntlcm91z4.cloudfront.net/user_34ssYi3rD3Q2hPLqjEruJBlk4gO/hf_20260630_214653_f8684e60-36e6-43fc-86cb-2282ea0819e1.mp4'; s2.type='video/mp4';
+      V.appendChild(s1); V.appendChild(s2);
+      var grade=document.createElement('div'); grade.id='pol-grade';
+      stage.insertBefore(grade, stage.firstChild);
+      stage.insertBefore(V, stage.firstChild);
+      try{V.load();}catch(e){}
+      wire();
+    }
+    window.__perdePol=function(){ var sec=document.querySelector('[data-genre="pol"]'),stage=document.getElementById('pol-stage'); if(sec&&stage&&!document.getElementById('pol-scrub')){try{build(stage,sec);}catch(e){} } return !!document.getElementById('pol-scrub'); };
+  })();
+
+  /* ---------- generic: scrub video that freezes on its last frame, content kept above ---------- */
+  function makeFreezeScrub(opt){
+    var V,SEC,duration=0,ready=false,seeking=false,vtarget=0,vwanted=0,primed=false,wrap;
+    function progress(){var r=SEC.getBoundingClientRect();var run=SEC.offsetHeight-window.innerHeight;return clamp(-r.top/run,0,1);}
+    function commit(){ if(!ready||!duration||seeking)return; if(!V.paused){try{V.pause();}catch(e){}} var tt=clamp(vwanted,0,duration-0.05); if(Math.abs(V.currentTime-tt)<0.008)return; seeking=true; try{V.currentTime=tt;}catch(e){seeking=false;} }
+    return function(){
+      SEC=document.querySelector('[data-genre="'+opt.genre+'"]'); var stage=document.getElementById(opt.stage);
+      if(!SEC||!stage) return false;
+      if(stage['__'+opt.genre]) return true; stage['__'+opt.genre]=true;
+      opt.brand&&opt.brand(SEC,stage,function(w){wrap=w;});
+      var st=document.createElement('style'); st.textContent=opt.css; document.head.appendChild(st);
+      if(wrap){ wrap.style.zIndex='4'; wrap.style.opacity='0'; }
+      V=document.createElement('video'); V.id=opt.vid; V.muted=true; V.preload='auto'; V.setAttribute('playsinline',''); V.setAttribute('muted','');
+      var s1=document.createElement('source'); s1.src=opt.local; s1.type='video/mp4';
+      var s2=document.createElement('source'); s2.src=opt.url; s2.type='video/mp4';
+      V.appendChild(s1); V.appendChild(s2);
+      stage.insertBefore(V, stage.firstChild);
+      try{V.load();}catch(e){}
+      V.addEventListener('loadedmetadata',function(){duration=V.duration||0;});
+      V.addEventListener('loadeddata',function(){ready=true;try{V.pause();}catch(e){}});
+      V.addEventListener('seeked',function(){seeking=false;});
+      function prime(){ if(primed)return; primed=true; try{var p=V.play(); if(p&&p.then){p.then(function(){try{V.pause();}catch(e){}}).catch(function(){});}else{V.pause();}}catch(e){} }
+      ['touchstart','wheel','click','keydown'].forEach(function(ev){window.addEventListener(ev,prime,{once:true,passive:true});});
+      (function tick(){
+        var p=progress();
+        if(duration){ vtarget=clamp(p/opt.PV,0,1)*duration; }
+        vwanted += (vtarget-vwanted)*0.22; if(Math.abs(vtarget-vwanted)<0.004) vwanted=vtarget; commit();
+        if(wrap){ wrap.style.opacity=clamp((p-0.44)/0.12,0,1).toFixed(3); }
+        requestAnimationFrame(tick);
+      })();
+      return true;
+    };
+  }
+
+  /* ---------- B) AKSIYON: samurai scrub -> freeze; AKSIYON split fades in on top ---------- */
+  window.__perdeAks=makeFreezeScrub({
+    genre:'sam', stage:'sam-stage', vid:'aks-scrub', PV:0.5,
+    local:'perde_aksiyon.mp4',
+    url:'https://d8j0ntlcm91z4.cloudfront.net/user_34ssYi3rD3Q2hPLqjEruJBlk4gO/hf_20260630_230215_ef57d2a4-e29a-414b-89ca-dd2c377b3de2.mp4',
+    css:'[data-genre="sam"] #sam-fig,[data-genre="sam"] #sam-petals{display:none !important;}[data-genre="sam"] #sam-card{z-index:6;}#aks-scrub{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;background:#000;pointer-events:none;}',
+    brand:function(SEC,stage,setWrap){
+      SEC.setAttribute('data-screen-label','AKSİYON');
+      var top=document.getElementById('sam-top'), bot=document.getElementById('sam-bot');
+      if(top) top.textContent='AKSİYON';
+      if(bot) bot.textContent='AKSİYON';
+      if(top&&top.parentElement) setWrap(top.parentElement.parentElement);
+      stage.querySelectorAll('*').forEach(function(el){
+        if(el.children.length) return; var t=(el.textContent||'').trim();
+        if(t.indexOf('KIZIL ATEŞ')>=0){ el.textContent='SAHNE 03 · AKSİYON · TAM GAZ'; el.style.zIndex='6'; }
+        else if(t.indexOf('TÜR 02 / SAMURAY')>=0) el.textContent='TÜR 02 / AKSİYON';
+        else if(t.indexOf('Destansı dövüş')>=0) el.textContent='Yüksek tempo, sert darbeler, nefes kesen kovalamaca. Aksiyon bir nefeste.';
+      });
+      document.querySelectorAll('*').forEach(function(el){ if(el.children.length) return; var t=(el.textContent||'').trim(); if(t==='SAMURAY'||t==='Samuray') el.textContent=(t===t.toUpperCase()?'AKSİYON':'Aksiyon'); });
+    }
+  });
+
+  /* ---------- C) ROMANTIK: slow-dance scrub -> freeze; card over last frame ---------- */
+  window.__perdeRom=makeFreezeScrub({
+    genre:'rom', stage:'rom-stage', vid:'rom-scrub', PV:0.75,
+    local:'perde_romantik.mp4',
+    url:'https://d8j0ntlcm91z4.cloudfront.net/user_34ssYi3rD3Q2hPLqjEruJBlk4gO/hf_20260630_233721_5f65e1c7-426c-42e8-aa95-a8d8491d9747.mp4',
+    css:'[data-genre="rom"] #rom-hand,[data-genre="rom"] #rom-rose,[data-genre="rom"] #rom-petals,[data-genre="rom"] #rom-glow{display:none !important;}[data-genre="rom"] #rom-card{z-index:6;}#rom-scrub{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;background:#000;pointer-events:none;}',
+    brand:function(SEC,stage,setWrap){
+      stage.querySelectorAll('*').forEach(function(el){ if(el.children.length) return; var t=(el.textContent||'').trim(); if(t.indexOf('GÜL')>=0&&t.indexOf('ROMANTİK')>=0) el.style.zIndex='6'; });
+    }
+  });
+
+  /* ---------- D) BILIM KURGU: cockpit -> warp scrub -> freeze; card over last frame ---------- */
+  window.__perdeSci=makeFreezeScrub({
+    genre:'sci', stage:'sci-stage', vid:'sci-scrub', PV:0.82,
+    local:'perde_bilimkurgu.mp4',
+    url:'https://d8j0ntlcm91z4.cloudfront.net/user_34ssYi3rD3Q2hPLqjEruJBlk4gO/hf_20260701_063109_fcb9214a-5cec-4213-8009-cc55f30b9b15.mp4',
+    css:'[data-genre="sci"] #sci-glow,[data-genre="sci"] #sci-stars,[data-genre="sci"] #sci-portal,[data-genre="sci"] #sci-ship{display:none !important;}[data-genre="sci"] #sci-card{z-index:6;}#sci-scrub{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;background:#000;pointer-events:none;}',
+    brand:function(SEC,stage,setWrap){
+      stage.querySelectorAll('*').forEach(function(el){ if(el.children.length) return; var t=(el.textContent||'').trim(); if(t.indexOf('BİLİM KURGU')>=0&&t.indexOf('WARP')>=0) el.style.zIndex='6'; });
+    }
+  });
+
+  var tries=0, iv=setInterval(function(){
+    tries++; var a=false,b=false,c=false,d=false;
+    try{a=window.__perdePol();}catch(e){}
+    try{b=window.__perdeAks();}catch(e){}
+    try{c=window.__perdeRom();}catch(e){}
+    try{d=window.__perdeSci();}catch(e){}
+    if((a&&b&&c&&d)||tries>500) clearInterval(iv);
+  },100);
+}
+
+// Guards against React Strict Mode double-invoking the effect in dev: the scrub
+// setup (rAF loops + video creation) must run exactly once.
+let scrubStarted = false;
+
+export default function CinematicLanding() {
+  useEffect(() => {
+    const controller = new Cinematic();
+    controller.componentDidMount();
+    if (!scrubStarted) {
+      scrubStarted = true;
+      try { initScrubVideos(); } catch (e) { /* videos are progressive enhancement */ }
+    }
+    return () => controller.componentWillUnmount();
+  }, []);
+
+  return <div dangerouslySetInnerHTML={{ __html: MARKUP }} />;
+}

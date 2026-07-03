@@ -1,0 +1,13 @@
+*{ box-sizing:border-box; }
+html{ scroll-behavior:auto; }
+body{ margin:0; background:#070609; color:#ECE6DA; font-family:'Manrope',sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+::selection{ background:#F6A93B; color:#070609; }
+
+@keyframes recblink{ 0%,49%{opacity:1} 50%,100%{opacity:.12} }
+@keyframes hintbob{ 0%,100%{transform:translateY(0); opacity:.5} 50%{transform:translateY(8px); opacity:1} }
+@keyframes grainshift{ 0%{transform:translate(0,0)} 10%{transform:translate(-4%,-4%)} 30%{transform:translate(3%,-2%)} 50%{transform:translate(-2%,3%)} 70%{transform:translate(4%,2%)} 90%{transform:translate(-3%,4%)} 100%{transform:translate(0,0)} }
+@keyframes spin{ to{ transform:rotate(360deg) } }
+@keyframes portalpulse{ 0%,100%{ box-shadow:0 0 60px 8px #3FE6FF, inset 0 0 40px #9A7CFF } 50%{ box-shadow:0 0 110px 22px #3FE6FF, inset 0 0 70px #9A7CFF } }
+
+.ftcol a{ color:#9b958a; text-decoration:none; }
+.ftcol a:hover{ color:#F6A93B; }
