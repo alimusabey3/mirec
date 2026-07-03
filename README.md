@@ -37,24 +37,32 @@ npm run start
   `id` üzerinden erişildiği için markup `dangerouslySetInnerHTML` ile birebir
   korunmuştur.
 
+### Dil desteği (TR / EN)
+
+Sağ üst-ortadaki **TR / EN** düğmesiyle dil değişir. Markup iki dilde tutulur
+(`MARKUP.tr` / `MARKUP.en`) ve dil değişince `key={lang}` ile tüm bölüm yeniden
+mount edilir; scroll kontrolcüsü ve scrub videolar yeni DOM'a yeniden bağlanır
+(eski `requestAnimationFrame` döngüleri, videoları DOM'dan çıkınca kendini
+durdurur). Seçim `localStorage`'a (`mirec_lang`) yazılır. Varsayılan: Türkçe.
+
+- Metin düzenlemek için: `app/CinematicLanding.jsx` içindeki `MARKUP` nesnesi.
+
 ### Scroll-scrub videolar
 
 Her tür sahnesinde scroll'a bağlı **scrub video** vardır: scroll ilerledikçe
 videonun `currentTime`'ı kayar (`initScrubVideos`, orijinal script'in birebir
 portu). Videolar sahnenin CSS silüetlerinin yerini alır.
 
-| Sahne | Yerel dosya (`public/`) | Yedek |
-|------|--------------------------|-------|
-| Polisiye | `perde_polisiye.mp4` (yoksa CDN) | CloudFront |
-| Aksiyon (samuray sahnesi) | `perde_aksiyon.mp4` ✔ | CloudFront |
-| Romantik | `perde_romantik.mp4` (yoksa CDN) | CloudFront |
-| Bilim Kurgu | `perde_bilimkurgu.mp4` (yoksa CDN) | CloudFront |
+| Sahne | Yerel dosya (`public/`) |
+|------|--------------------------|
+| Polisiye | `perde_polisiye.mp4` |
+| Aksiyon | `perde_aksiyon.mp4` |
+| Romantik | `perde_romantik.mp4` |
+| Bilim Kurgu | `perde_bilimkurgu.mp4` |
 
-- Her `<video>` iki kaynakla oluşturulur: önce `public/`'teki yerel dosya, o yoksa
-  CloudFront CDN URL'si. Şu an yalnızca `perde_aksiyon.mp4` yerelde; diğer üçü
-  CDN'den yüklenir (test edildi, üçü de erişilebilir).
-- Kendi videolarını kullanmak istersen `perde_polisiye.mp4`, `perde_romantik.mp4`,
-  `perde_bilimkurgu.mp4` dosyalarını `public/` içine koyman yeterli; kod otomatik
-  yereli tercih eder.
+- **Tüm videolar yereldir** (`public/` içinde); harici/CloudFront linki yoktur.
+  Her `<video>` tek bir yerel `<source>` ile oluşturulur.
+- Videoyu değiştirmek için ilgili dosyayı `public/` içinde aynı adla değiştirmen
+  yeterli.
 - Not: `perde_aksiyon_1.mp4` orijinal script tarafından referans verilmiyor
   (yalnızca `perde_aksiyon.mp4` kullanılıyor).
