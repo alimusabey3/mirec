@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 720" role="img" aria-label="MIREC">
+  <!-- MIREC klaket logosu: gövde + üstte kesikli şeritli çift bar (biri açık) -->
+  <defs>
+    <pattern id="stripes" width="120" height="120" patternTransform="rotate(115)" patternUnits="userSpaceOnUse">
+      <rect width="120" height="120" fill="#EDE8DE"/>
+      <rect width="60" height="120" fill="#0B0A10"/>
+    </pattern>
+  </defs>
+  <!-- açık üst bar (menteşe sol uçta, hafif kalkık) -->
+  <g transform="rotate(-14 180 292)">
+    <rect x="180" y="220" width="640" height="64" fill="url(#stripes)"/>
+  </g>
+  <!-- gövdeye bitişik alt bar (araya ince boşluk = menteşe çizgisi) -->
+  <rect x="180" y="228" width="640" height="64" fill="url(#stripes)"/>
+  <!-- gövde -->
+  <rect x="180" y="300" width="640" height="360" fill="#EDE8DE"/>
+</svg>
