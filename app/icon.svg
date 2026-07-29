@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Sekme ikonu: koyu yuvarlatılmış zemin + klaket işareti (küçük boyutta net) -->
+  <rect width="100" height="100" rx="20" fill="#0B0A10"/>
+  <defs>
+    <pattern id="fs" width="120" height="120" patternTransform="rotate(115)" patternUnits="userSpaceOnUse">
+      <rect width="120" height="120" fill="#EDE8DE"/>
+      <rect width="60" height="120" fill="#0B0A10"/>
+    </pattern>
+  </defs>
+  <g transform="translate(10,21) scale(0.08)">
+    <g transform="rotate(-14 180 292)">
+      <rect x="180" y="220" width="640" height="64" fill="url(#fs)"/>
+    </g>
+    <rect x="180" y="228" width="640" height="64" fill="url(#fs)"/>
+    <rect x="180" y="300" width="640" height="360" fill="#EDE8DE"/>
+  </g>
+</svg>
