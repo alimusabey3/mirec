@@ -31,10 +31,10 @@ export default function GizlilikPage() {
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "64px 24px 96px" }}>
         <a href="/" style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, letterSpacing: 2, color: C.dim, textDecoration: "none" }}>← MIREC</a>
         <h1 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, textTransform: "uppercase", fontSize: "clamp(34px,6vw,52px)", lineHeight: 0.95, color: C.head, margin: "18px 0 10px" }}>Privacy Policy</h1>
-        <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11.5, letterSpacing: 1, color: C.dim, marginBottom: 28 }}>Last updated: July 29, 2026</div>
+        <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11.5, letterSpacing: 1, color: C.dim, marginBottom: 28 }}>Last updated: 29 July 2026</div>
 
         <P>This policy explains what personal data MIREC collects through mirec.online, why we collect it, and what rights you have over it.</P>
-        <P>MIREC is an early-stage project operated by <strong style={{ color: C.head }}>Ali Musabeyoğlu</strong>, based in <Mark>[city]</Mark>, Türkiye. In this policy, &quot;we&quot;, &quot;us&quot;, and &quot;MIREC&quot; refer to that operator, who is the data controller for the personal data described below.</P>
+        <P>MIREC is an early-stage project operated by <strong style={{ color: C.head }}>Ali Musabeyoğlu</strong>, based in Istanbul, Türkiye. In this policy, &quot;we&quot;, &quot;us&quot;, and &quot;MIREC&quot; refer to that operator, who is the data controller for the personal data described below.</P>
         <P>MIREC is not yet incorporated as a company. If a company is later formed to operate MIREC, it will become the data controller, and your data will be transferred to it on the same terms set out in this policy. We will update this page and notify subscribers by email before that transfer takes effect.</P>
         <P>If you have any questions about this policy or your data, contact us at <a href="mailto:privacy@mirec.online" style={{ color: C.gold }}>privacy@mirec.online</a>.</P>
 
@@ -130,7 +130,7 @@ export default function GizlilikPage() {
         <H2>13. Contact</H2>
         <P>
           <strong style={{ color: C.head }}>Ali Musabeyoğlu</strong><br />
-          <Mark>[City]</Mark>, Türkiye<br />
+          Istanbul, Türkiye<br />
           <a href="mailto:privacy@mirec.online" style={{ color: C.gold }}>privacy@mirec.online</a>
         </P>
       </div>
