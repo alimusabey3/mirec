@@ -81,7 +81,8 @@ export default function GizlilikPage() {
         <H2>4. Who we share data with</H2>
         <P>We do not sell or rent your data. We share it only with service providers who process it on our behalf, under contract, and only to the extent needed to run the service:</P>
         <ul style={{ paddingLeft: 22, margin: "0 0 14px" }}>
-          <LI><strong style={{ color: C.head }}>Brevo</strong> — stores our mailing list and delivers our emails.</LI>
+          <LI><strong style={{ color: C.head }}>Resend</strong> — delivers our emails (confirmation and product updates).</LI>
+          <LI><strong style={{ color: C.head }}>Supabase</strong> — stores our waitlist database.</LI>
           <LI><strong style={{ color: C.head }}>Vercel</strong> — hosts the website and processes server logs.</LI>
           <LI><Mark>[Analytics provider, if used]</Mark> — provides aggregated site usage statistics.</LI>
         </ul>

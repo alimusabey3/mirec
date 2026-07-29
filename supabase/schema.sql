@@ -99,8 +99,18 @@ create table if not exists public.waitlist (
   email text not null unique,
   consent boolean not null default false,
   locale text not null default 'tr',
+  confirmed boolean not null default false,          -- double opt-in: onay linkine tıklandı mı
+  confirm_token uuid not null default gen_random_uuid(),
+  confirmed_at timestamptz,
   created_at timestamptz not null default now()
 );
+-- Şemayı daha önce çalıştıranlar için migrasyon:
+alter table public.waitlist add column if not exists confirmed boolean not null default false;
+alter table public.waitlist add column if not exists confirm_token uuid not null default gen_random_uuid();
+alter table public.waitlist add column if not exists confirmed_at timestamptz;
+-- Not: politika gereği onaylanmamış kayıtlar 30 gün içinde silinmeli —
+--   delete from public.waitlist where confirmed = false and created_at < now() - interval '30 days';
+-- (Supabase panelinden pg_cron ile günlük zamanlanabilir.)
 alter table public.waitlist enable row level security;
 -- Bilerek politika yok: anon/authenticated erişemez; service role RLS'i baypas eder.
 
