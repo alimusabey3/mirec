@@ -75,7 +75,7 @@ export async function POST(req) {
       from: process.env.RESEND_FROM || "MIREC <noreply@mirec.online>",
       to: [email],
       subject: m.subject,
-      html: confirmationHtml(m, `${site}/api/waitlist/onay?token=${token}`, site),
+      html: confirmationHtml(m, `${site}/api/waitlist/onay?token=${token}&lang=${locale}`, site),
     }),
   });
   if (!r.ok) {
