@@ -34,7 +34,7 @@ function loadPixel() {
 
 export default function Consent() {
   const [show, setShow] = useState(false);
-  const [lang, setLang] = useState("tr");
+  const [lang, setLang] = useState("en");
 
   useEffect(() => {
     try {
@@ -44,6 +44,15 @@ export default function Consent() {
       if (c === "1") loadPixel();
       else if (c !== "0") setShow(true);
     } catch { /* localStorage kapalıysa bant gösterme, pixel yükleme */ }
+  }, []);
+
+  // Site dili değişince bant da anında o dile geçer (<html lang> canlı izlenir).
+  useEffect(() => {
+    const sync = () => { const l = document.documentElement.lang; if (TXT[l]) setLang(l); };
+    sync();
+    const obs = new MutationObserver(sync);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
+    return () => obs.disconnect();
   }, []);
 
   // Footer'daki "Çerez tercihleri" linki bandı yeniden açar (onayı geri almak,

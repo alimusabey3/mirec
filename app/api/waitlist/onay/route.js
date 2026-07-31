@@ -12,7 +12,7 @@ const LOCALES = ["tr", "en", "es", "pt", "id", "ja", "hi"];
 export async function GET(req) {
   const reqUrl = new URL(req.url);
   const token = reqUrl.searchParams.get("token") || "";
-  const linkLang = LOCALES.includes(reqUrl.searchParams.get("lang")) ? reqUrl.searchParams.get("lang") : "tr";
+  const linkLang = LOCALES.includes(reqUrl.searchParams.get("lang")) ? reqUrl.searchParams.get("lang") : "en";
   const fail = () => Response.redirect(new URL(`/onay?ok=0&lang=${linkLang}`, reqUrl), 302);
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

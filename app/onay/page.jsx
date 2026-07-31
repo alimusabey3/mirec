@@ -15,7 +15,7 @@ const T = {
 
 export default function OnayPage({ searchParams }) {
   const ok = searchParams?.ok === "1";
-  const t = T[searchParams?.lang] || T.tr;
+  const t = T[searchParams?.lang] || T.en;
   return (
     <div style={{ minHeight: "100vh", background: "#070609", color: "#ECE6DA", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: 24, fontFamily: "'Manrope',sans-serif" }}>
       <img src="/logo.png" alt="MIREC" width={110} style={{ marginBottom: 30 }} />

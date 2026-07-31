@@ -2,14 +2,14 @@ import "./globals.css";
 import Consent from "./Consent";
 
 export const metadata = {
-  title: "MIREC — Yapay Zekâ Mikro-Dizi Stüdyosu",
+  title: "MIREC — AI Micro-Drama Studio",
   description:
-    "Senaryonu yaz, sahneyi tarif et — karakterler, çekimler, seslendirme ve kurgu yapay zekâyla gelsin. Herkesin bir dizisi var.",
+    "Write your story, describe the scene — characters, shots, voiceover and editing come with AI. Everyone has a series.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="tr">
+    <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />

@@ -42,7 +42,7 @@ export async function POST(req) {
   const email = String(body.email || "").trim().toLowerCase();
   const consent = Boolean(body.consent);
   const LOCALES = ["tr", "en", "es", "pt", "id", "ja", "hi"];
-  const locale = LOCALES.includes(body.locale) ? body.locale : "tr";
+  const locale = LOCALES.includes(body.locale) ? body.locale : "en";
   if (!EMAIL_RE.test(email)) return Response.json({ error: "Geçerli bir e-posta adresi gir" }, { status: 400 });
   if (!consent) return Response.json({ error: "Duyuru onayı gerekli" }, { status: 400 });
 

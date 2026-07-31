@@ -401,8 +401,8 @@ function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 // Pazar önceliği sırasıyla (EN varsayılan global, ES LatAm, PT-BR, ID, JA, HI).
 // Bir dilin markup'ı yoksa (çeviri henüz üretilmemişse) EN'e düşer.
 const LANGS = [
-  { code: "tr", label: "TR", name: "Türkçe" },
   { code: "en", label: "EN", name: "English" },
+  { code: "tr", label: "TR", name: "Türkçe" },
   { code: "es", label: "ES", name: "Español" },
   { code: "pt", label: "PT", name: "Português (BR)" },
   { code: "id", label: "ID", name: "Bahasa Indonesia" },
@@ -507,7 +507,7 @@ function waitForVideos(onProgress, expect = 4, timeoutMs = 10000) {
 }
 
 export default function CinematicLanding() {
-  const [lang, setLang] = useState("tr");
+  const [lang, setLang] = useState("en"); // birincil dil İngilizce; kayıtlı tercih varsa aşağıda geri yüklenir
   // Açılış perdesi durumu (yalnız ilk yüklemede gösterilir)
   const [boot, setBoot] = useState({ visible: true, fading: false, done: 0, total: 4 });
   const bootRan = useRef(false);
