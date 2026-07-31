@@ -65,7 +65,7 @@ export default function GizlilikPage() {
           </table>
         </div>
         <P>We also collect limited, aggregated analytics about site usage (pages viewed, approximate country, referring site, device type). This data is not used to identify you individually.</P>
-        <P>We do <strong style={{ color: C.head }}>not</strong> collect names, phone numbers, payment details, or account credentials. We do not sell personal data, and we do not use your data for advertising profiling.</P>
+        <P>We do <strong style={{ color: C.head }}>not</strong> collect names, phone numbers, payment details, or account credentials. We do not sell personal data. We do not set advertising cookies without your consent — see Section 9 for the consent-based Meta Pixel.</P>
 
         <H2>2. Legal basis for processing</H2>
         <P>If you are in the European Economic Area or the United Kingdom, we rely on the following legal bases under the GDPR:</P>
@@ -84,6 +84,7 @@ export default function GizlilikPage() {
           <LI><strong style={{ color: C.head }}>Resend</strong> — delivers our emails (confirmation and product updates).</LI>
           <LI><strong style={{ color: C.head }}>Supabase</strong> — stores our waitlist database.</LI>
           <LI><strong style={{ color: C.head }}>Vercel</strong> — hosts the website and processes server logs.</LI>
+          <LI><strong style={{ color: C.head }}>Meta Platforms</strong> — provides the Meta Pixel for ad measurement, only if you accept it via the cookie banner (see Section 9).</LI>
           <LI><Mark>[Analytics provider, if used]</Mark> — provides aggregated site usage statistics.</LI>
         </ul>
         <P>We may also disclose data where we are legally required to do so, for example in response to a valid legal request.</P>
@@ -117,7 +118,8 @@ export default function GizlilikPage() {
         <P>Every email we send contains an unsubscribe link. One click removes you from the list — no login, no confirmation step, no questions. You can also email us and we will remove you manually.</P>
 
         <H2>9. Cookies</H2>
-        <P>We use only what is necessary to make the site work and to collect aggregated analytics. We do not use advertising or cross-site tracking cookies. Where consent is required for non-essential cookies, we ask for it before setting them, and declining does not affect your ability to use the site.</P>
+        <P>By default we use only what is necessary to make the site work and to collect aggregated analytics.</P>
+        <P>With your consent, we also use the <strong style={{ color: C.head }}>Meta Pixel</strong> (Meta Platforms) to measure the effectiveness of our advertising — for example, whether an ad brought you here and whether you joined the waitlist. The pixel is <strong style={{ color: C.head }}>off by default</strong> and loads only after you click &quot;Accept&quot; in the cookie banner. Declining does not affect your ability to use the site, and you can change your mind at any time by clearing this site&apos;s cookies/storage in your browser, which will make the banner appear again. Data collected by the pixel is processed by Meta as described in Meta&apos;s own privacy policy.</P>
 
         <H2>10. Children</H2>
         <P>MIREC is not directed at children under 16, and we do not knowingly collect their personal data. If you believe a child has given us their data, contact us and we will delete it.</P>

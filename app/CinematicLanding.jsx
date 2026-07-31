@@ -473,6 +473,8 @@ function initWaitlist() {
         msg.textContent = j.already ? form.dataset.dup : form.dataset.ok;
         msg.style.color = "#7bbf5a";
         document.getElementById("wlEmail").value = "";
+        // Reklam dönüşümü: pixel yalnız çerez onayı verilmişse yüklüdür.
+        try { if (window.fbq && !j.already) window.fbq("track", "Lead"); } catch (e) {}
       } else {
         msg.textContent = j.error || form.dataset.err;
         msg.style.color = "#E2452F";

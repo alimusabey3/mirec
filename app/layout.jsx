@@ -1,4 +1,5 @@
 import "./globals.css";
+import Consent from "./Consent";
 
 export const metadata = {
   title: "MIREC — Yapay Zekâ Mikro-Dizi Stüdyosu",
@@ -17,7 +18,10 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Consent />
+      </body>
     </html>
   );
 }
