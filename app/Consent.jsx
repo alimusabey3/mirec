@@ -46,6 +46,21 @@ export default function Consent() {
     } catch { /* localStorage kapalıysa bant gösterme, pixel yükleme */ }
   }, []);
 
+  // Footer'daki "Çerez tercihleri" linki bandı yeniden açar (onayı geri almak,
+  // vermek kadar kolay olmalı). Markup dil değişiminde yeniden enjekte edildiği
+  // için dinleyici delege edilir.
+  useEffect(() => {
+    const onClick = (e) => {
+      if (e.target.closest && e.target.closest("#cookiePrefs")) {
+        e.preventDefault();
+        try { const l = localStorage.getItem("mirec_lang"); if (TXT[l]) setLang(l); } catch {}
+        setShow(true);
+      }
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, []);
+
   if (!show) return null;
   const t = TXT[lang];
 
@@ -53,6 +68,8 @@ export default function Consent() {
     try { localStorage.setItem(KEY, accept ? "1" : "0"); } catch {}
     setShow(false);
     if (accept) loadPixel();
+    // Daha önce kabul edilip pixel yüklendiyse ve şimdi reddedildiyse: izlemeyi durdur.
+    else if (window.fbq) { try { window.fbq("consent", "revoke"); } catch {} }
   }
 
   return (
