@@ -566,7 +566,7 @@ export default function CinematicLanding() {
             <div style={{ width: `${Math.round((boot.done / (boot.total || 1)) * 100)}%`, height: "100%", background: "#F6A93B", transition: "width .3s ease" }} />
           </div>
           <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 10.5, letterSpacing: 2, color: "#7a756b" }}>
-            {lang === "tr" ? "GÖRÜNTÜLER YÜKLENİYOR" : "LOADING FOOTAGE"} {boot.done}/{boot.total}
+            LOADING FOOTAGE {boot.done}/{boot.total}
           </div>
         </div>
       )}
