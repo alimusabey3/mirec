@@ -1,5 +1,6 @@
 import "./globals.css";
 import Consent from "./Consent";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata = {
   title: "MIREC — AI Micro-Drama Studio",
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
       <body>
         {children}
         <Consent />
+        <Analytics />
       </body>
     </html>
   );

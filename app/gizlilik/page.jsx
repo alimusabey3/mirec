@@ -85,7 +85,7 @@ export default function GizlilikPage() {
           <LI><strong style={{ color: C.head }}>Supabase</strong> — stores our waitlist database.</LI>
           <LI><strong style={{ color: C.head }}>Vercel</strong> — hosts the website and processes server logs.</LI>
           <LI><strong style={{ color: C.head }}>Meta Platforms</strong> — provides the Meta Pixel for ad measurement, only if you accept it via the cookie banner (see Section 9).</LI>
-          <LI><Mark>[Analytics provider, if used]</Mark> — provides aggregated site usage statistics.</LI>
+          <LI><strong style={{ color: C.head }}>Vercel Analytics</strong> — provides aggregated, cookie-free site usage statistics.</LI>
         </ul>
         <P>We may also disclose data where we are legally required to do so, for example in response to a valid legal request.</P>
 
